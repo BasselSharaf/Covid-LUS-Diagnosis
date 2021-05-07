@@ -112,3 +112,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+Five_Frames_Per_patient
