@@ -4,13 +4,13 @@ import cv2
 import random
 from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from mostCommon import most_common
 from sklearn.metrics import f1_score
-import pickle
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 my_data = pd.read_csv('../data/Five_Frames_Per_patient.csv')
 data_array = my_data.to_numpy()
@@ -30,18 +30,16 @@ r = []
 conf_matricies = []
 f1_reports = []
 f1_micro = []
-for i in range(5):
-    r.append(random.randint(0, 100))
-print('Random seeds are: ')
-print(r)
-
+for i in range(7):
+    r.append(random.randint(0, 1000))
+print('Random seeds are: '+str(r))
 
 number_of_models = 11
 X = np.asarray(images_data)
 y = np.asarray(my_data['Label'])
 
 for k in range(len(r)):
-    print('--------------------------------- Iteration '+str(k)+'--------------------------------- \n')
+    print('--------------------------------- Iteration ' + str(k) + '--------------------------------- \n')
     Xandy = []
     models = []
     # creating models
@@ -78,6 +76,21 @@ for k in range(len(r)):
         Xandy[i][0] = x
         Xandy[i][2] = y1
 
+    print('Normalizing and applying PCA...')
+    for i in range(number_of_models):
+        scaler = StandardScaler()
+        # Fit on training set only
+        scaler.fit(Xandy[i][0])
+
+        # Apply transform on both training and test set
+        Xandy[i][0] = scaler.transform(Xandy[i][0])
+        Xandy[i][1] = scaler.transform(Xandy[i][1])
+    for i in range(number_of_models):
+        pca = PCA(.95)
+        pca.fit(Xandy[i][0])
+        Xandy[i][0] = pca.transform(Xandy[i][0])
+        Xandy[i][1] = pca.transform(Xandy[i][1])
+    print(len(Xandy[0][0][0]))
     print('Training Models...')
     for i in range(number_of_models):
         models[i].fit(Xandy[i][0], Xandy[i][2])
@@ -93,8 +106,6 @@ for k in range(len(r)):
         for j in range(len(predicted)):
             voting.append(predicted[j][i])
         voted_prediction.append(most_common(voting))
-
-    print('')
     conf_matrix = confusion_matrix(Xandy[0][3], voted_prediction)
     print(conf_matrix)
     conf_matricies.append(conf_matrix)
@@ -104,8 +115,7 @@ for k in range(len(r)):
     f1_reports.append(classification_report)
     f1_micro.append(f1_score(Xandy[0][3], voted_prediction, average='micro'))
 
-
-print('Average f1 micro of all iterations is: '+str(sum(f1_micro)/len(f1_micro)))
+print('Average f1 micro of all iterations is: ' + str(sum(f1_micro) / len(f1_micro)))
 
 print('Saving models....')
 np.save('models', models)
