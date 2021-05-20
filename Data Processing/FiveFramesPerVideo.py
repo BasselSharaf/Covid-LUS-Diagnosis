@@ -16,26 +16,27 @@ if not os.path.exists(saving_folder):
 p = 1
 # frame number for each patient
 f = 1
+changed = False
 print('Processing Videos.....')
 for d in data:
     cap = cv2.VideoCapture(videos_path + d[0] + '.' + d[1])
-    quarter = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) // 5
-    take = quarter
+    quarter = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) // 6
+    take = quarter-2
+    changed = False
     i = 0
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
         if i == take:
-            cv2.imwrite(saving_folder + '/' + d[0] + '_p'+str(p) + '_f' + str(f) + '.jpg', frame)
+            if f < 6:
+                cv2.imwrite(saving_folder + '/' + d[0] + '_p'+str(p) + '_f' + str(f) + '.jpg', frame)
             take += quarter
             f += 1
-            if f == 6:
-                p += 1
-                f = 1
-                break
         i += 1
-
+    p += 1
+    f = 1
     cap.release()
+
 print('all images have been saved')
 cv2.destroyAllWindows()
