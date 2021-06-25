@@ -116,3 +116,7 @@ dmypy.json
 Thirty_Frames_Per_patient
 Five_Frames_Per_patient
 Fifteen_Frames_Per_patient/
+*.pb
+*.data-00000-of-00001
+*.index
+Deep Learning/_plot.png
