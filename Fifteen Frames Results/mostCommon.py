@@ -27,7 +27,7 @@ def patient_score(y_test,y_pred):
     #making patient test values
     while i<len(y_test):
         patient_test.append(y_test[i])
-        i=i+5
+        i=i+15
     #making patient predict values
     i=0
     counter=0
@@ -35,7 +35,7 @@ def patient_score(y_test,y_pred):
     while i<len(y_pred):
         frames.append(y_pred[i])
         counter=counter+1
-        if(counter==5):
+        if(counter==15):
             prediction=most_common(frames)
             patient_pred.append(prediction)
             frames=[]

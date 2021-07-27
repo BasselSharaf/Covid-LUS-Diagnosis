@@ -38,5 +38,6 @@ for d in data:
     f = 1
     cap.release()
 
-print('all images have been saved')
 cv2.destroyAllWindows()
+print('all images have been saved')
+
